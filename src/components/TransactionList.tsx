@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { styled } from "@mui/material/styles";
-import { Paper, Button, ListSubheader, Grid } from "@mui/material";
+import { Paper, Button, ListSubheader, Grid, Typography } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { isEmpty } from "lodash/fp";
 
@@ -70,6 +70,11 @@ const TransactionList: React.FC<TransactionListProps> = ({
               <TransferMoneyIllustration style={{ height: 200, width: 300, marginBottom: 30 }} />
             </Grid>
             <Grid item>
+              <Typography variant="body2" color="textSecondary" align="center">
+                Transactions you send, request, or take part in will appear here.
+              </Typography>
+            </Grid>
+            <Grid item>
               {showCreateButton && (
                 <Button
                   data-test="transaction-list-empty-create-transaction-button"
@@ -78,7 +83,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
                   component={RouterLink}
                   to="/transaction/new"
                 >
-                  Create A Transaction
+                  Create a Transaction
                 </Button>
               )}
             </Grid>
