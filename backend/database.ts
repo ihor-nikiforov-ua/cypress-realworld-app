@@ -60,6 +60,7 @@ import {
   getQueryWithoutFilterFields,
   getPayAppCreditedAmount,
   isRequestTransaction,
+  isAcceptedRequestTransaction,
   formatFullName,
   isLikeNotification,
   isCommentNotification,
@@ -591,9 +592,11 @@ export const updateTransactionById = (transactionId: string, edits: Partial<Tran
   const { senderId, receiverId } = transaction;
   const sender = getUserById(senderId);
   const receiver = getUserById(receiverId);
+  const updatedTransaction = { ...transaction, ...edits };
 
-  // if payment, debit sender's balance for payment amount
-  if (isRequestTransaction(transaction)) {
+  // a request is only paid once its addressee accepts it; any other verdict
+  // (a rejection) is recorded as-is, leaving both balances untouched
+  if (isRequestTransaction(transaction) && isAcceptedRequestTransaction(updatedTransaction)) {
     debitPayAppBalance(receiver, transaction);
     creditPayAppBalance(sender, transaction);
     edits.status = TransactionStatus.complete;
