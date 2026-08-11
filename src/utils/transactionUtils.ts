@@ -174,10 +174,16 @@ export const getQueryWithoutAmountFields = (query: TransactionQueryPayload) =>
 export const getQueryWithoutFilterFields = (query: TransactionQueryPayload) =>
   flow(omitAmountQueryFields, omitDateQueryFields, omitPaginationQueryFields)(query);
 
-// The query string the transactions endpoints accept, as their query-string
-// validators declare it. The feed machines hand a FETCH event straight to axios
-// as the request params, so without this every field an event happens to carry
-// - starting with xstate's own `type` - travels to the API as a query param.
+// The query string the transactions endpoints act on. The feed machines hand a
+// FETCH event straight to axios as the request params, so without this every
+// field an event happens to carry - starting with xstate's own `type` - travels
+// to the API as a query param.
+//
+// This list follows the names the endpoints read, not the ones their
+// query-string validator declares: the validator still names the date bounds
+// `rangeStartTs`/`rangeEndTs`, while the filtering reads the
+// `dateRangeStart`/`dateRangeEnd` this app sends. A name only the validator
+// knows drops the param instead of forwarding it.
 export const transactionQueryParams = [
   "page",
   "limit",
@@ -187,8 +193,8 @@ export const transactionQueryParams = [
   "receiverId",
   "amountMin",
   "amountMax",
-  "rangeStartTs",
-  "rangeEndTs",
+  "dateRangeStart",
+  "dateRangeEnd",
 ];
 
 export const getTransactionQueryParams = (event: object) => pick(transactionQueryParams, event);
