@@ -174,6 +174,25 @@ export const getQueryWithoutAmountFields = (query: TransactionQueryPayload) =>
 export const getQueryWithoutFilterFields = (query: TransactionQueryPayload) =>
   flow(omitAmountQueryFields, omitDateQueryFields, omitPaginationQueryFields)(query);
 
+// The query string the transactions endpoints accept, as their query-string
+// validators declare it. The feed machines hand a FETCH event straight to axios
+// as the request params, so without this every field an event happens to carry
+// - starting with xstate's own `type` - travels to the API as a query param.
+export const transactionQueryParams = [
+  "page",
+  "limit",
+  "status",
+  "requestStatus",
+  "senderId",
+  "receiverId",
+  "amountMin",
+  "amountMax",
+  "rangeStartTs",
+  "rangeEndTs",
+];
+
+export const getTransactionQueryParams = (event: object) => pick(transactionQueryParams, event);
+
 /* istanbul ignore next */
 export const padAmountWithZeros = (number: number) => Math.ceil(number * 1000);
 
