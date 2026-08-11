@@ -436,12 +436,23 @@ export const getTransactionsForUserByObj = curry((userId: string, query: object)
 export const getContactIdsForUser = (userId: string): Contact["id"][] =>
   flow(getContactsByUserId, map("contactUserId"))(userId);
 
+// A transaction marked private is its parties' business: it belongs in the feed
+// of whoever sent or received it and in nobody else's. The other privacy levels
+// place no such restriction on who may see a transaction.
+export const isVisibleToUser = (userId: User["id"]) => (transaction: Transaction) =>
+  transaction.privacyLevel !== DefaultPrivacyLevel.private ||
+  transaction.senderId === userId ||
+  transaction.receiverId === userId;
+
 export const getTransactionsForUserContacts = (userId: string, query?: object) =>
-  uniqBy(
-    "id",
-    flatMap(
-      (contactId) => getTransactionsForUserForApi(contactId, query),
-      getContactIdsForUser(userId)
+  filter(
+    isVisibleToUser(userId),
+    uniqBy(
+      "id",
+      flatMap(
+        (contactId) => getTransactionsForUserForApi(contactId, query),
+        getContactIdsForUser(userId)
+      )
     )
   );
 
